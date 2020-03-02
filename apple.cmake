@@ -1,0 +1,10 @@
+if(NOT APPLE)
+  return()
+endif()
+
+add_library(AppleFrameworks INTERFACE)
+set(FRAMEWORKS CoreFoundation;ApplicationServices;Foundation;IOKit;Security;bsm)
+foreach(FW ${FRAMEWORKS})
+  find_library(FW_PATH_${FW} ${FW})
+  target_link_libraries(AppleFrameworks INTERFACE ${FW_PATH_${FW}})
+endforeach()
