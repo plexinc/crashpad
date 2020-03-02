@@ -1,23 +1,23 @@
-add_library(compat OBJECT)
-crashpad_set_props(compat)
-target_link_libraries(compat PRIVATE crashpad_common)
+add_library(compat INTERFACE)
+#crashpad_set_props(compat)
+#target_link_libraries(compat PRIVATE crashpad_common)
 
-if(UNIX AND NOT APPLE)
-  target_include_directories(compat PUBLIC linux)
+if(UNIX AND (NOT APPLE))
+  target_include_directories(compat INTERFACE linux)
   target_sources(compat
     PRIVATE
     linux/sys/mman.cc
   )
 else()
-  target_include_directories(compat PUBLIC non_elf)
+  target_include_directories(compat INTERFACE non_elf)
 endif()
 
 if(NOT WIN)
-  target_include_directories(compat PUBLIC non_win)
+  target_include_directories(compat INTERFACE non_win)
 endif()
 
 if(WIN)
-  target_include_directories(compat PUBLIC win)
+  target_include_directories(compat INTERFACE win)
   target_sources(compat
     PRIVATE
     win/getopt.h
@@ -33,7 +33,7 @@ if(WIN)
 endif()
 
 if(APPLE)
-  target_include_directories(compat PUBLIC mac)
+  target_include_directories(compat INTERFACE mac)
 else()
-  target_include_directories(compat PUBLIC non_mac)
+  target_include_directories(compat INTERFACE non_mac)
 endif()

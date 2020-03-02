@@ -1,5 +1,6 @@
 add_library(snapshot OBJECT)
 crashpad_set_props(snapshot)
+target_link_libraries(snapshot PRIVATE mini_chromium_base)
 
 target_sources(snapshot
   PRIVATE

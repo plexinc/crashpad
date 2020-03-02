@@ -4,6 +4,7 @@ target_link_libraries(crashpad_handler
   PRIVATE
   crashpad_client
   ZLIB::ZLIB
+  AppleFrameworks
 )
 
 set_target_properties(crashpad_handler
@@ -59,3 +60,4 @@ if(WIN)
     win/crash_report_exception_handler.h
   )
 endif()
+

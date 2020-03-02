@@ -117,6 +117,90 @@ target_sources(util
   thread/worker_thread.h
 )
 
+if(APPLE)
+  target_sources(util
+    PRIVATE
+    mac/checked_mach_address_range.h
+    mac/launchd.h
+    mac/launchd.mm
+    mac/mac_util.cc
+    mac/mac_util.h
+    mac/service_management.cc
+    mac/service_management.h
+    mac/xattr.cc
+    mac/xattr.h
+    mach/child_port_handshake.cc
+    mach/child_port_handshake.h
+    mach/child_port_server.cc
+    mach/child_port_server.h
+    mach/child_port_types.h
+    mach/composite_mach_message_server.cc
+    mach/composite_mach_message_server.h
+    mach/exc_client_variants.cc
+    mach/exc_client_variants.h
+    mach/exc_server_variants.cc
+    mach/exc_server_variants.h
+    mach/exception_behaviors.cc
+    mach/exception_behaviors.h
+    mach/exception_ports.cc
+    mach/exception_ports.h
+    mach/exception_types.cc
+    mach/exception_types.h
+    mach/mach_extensions.cc
+    mach/mach_extensions.h
+    mach/mach_message.cc
+    mach/mach_message.h
+    mach/mach_message_server.cc
+    mach/mach_message_server.h
+    mach/notify_server.cc
+    mach/notify_server.h
+    mach/scoped_task_suspend.cc
+    mach/scoped_task_suspend.h
+    mach/symbolic_constants_mach.cc
+    mach/symbolic_constants_mach.h
+    mach/task_for_pid.cc
+    mach/task_for_pid.h
+    misc/capture_context_mac.S
+    misc/clock_mac.cc
+    misc/paths_mac.cc
+    net/http_transport_mac.mm
+    posix/process_info_mac.cc
+    process/process_memory_mac.cc
+    process/process_memory_mac.h
+    synchronization/semaphore_mac.cc
+  )
+
+  macro(MIG DEF_FILE)
+    get_filename_component(DEF_FILENAME ${DEF_FILE} NAME_WE)
+    add_custom_command(
+      OUTPUT
+        mach/${DEF_FILENAME}User.c
+        mach/${DEF_FILENAME}Server.c
+        mach/${DEF_FILENAME}.h
+        mach/${DEF_FILENAME}Server.h
+      DEPENDS
+        ${DEF_FILE}
+      COMMAND
+        cmake -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/mach
+      COMMAND
+        ${Python2_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/mach/mig.py ${DEF_FILE} mach/${DEF_FILENAME}User.c mach/${DEF_FILENAME}Server.c mach/${DEF_FILENAME}.h mach/${DEF_FILENAME}Server.h --include ${CMAKE_SOURCE_DIR}/compat/mac
+    )
+    target_sources(util
+      PRIVATE
+      mach/${DEF_FILENAME}User.c
+      mach/${DEF_FILENAME}Server.c
+    )
+  endmacro()
+
+  target_include_directories(util PRIVATE ${CMAKE_BINARY_DIR})
+
+  set(DEF_ROOT ${CMAKE_OSX_SYSROOT}/usr/include/mach)
+  MIG(${DEF_ROOT}/exc.defs)
+  MIG(${DEF_ROOT}/mach_exc.defs)
+  MIG(${DEF_ROOT}/notify.defs)
+  MIG(${CMAKE_CURRENT_SOURCE_DIR}/mach/child_port.defs)
+endif()
+
 if(UNIX)
   target_sources(util
     PRIVATE

@@ -1,8 +1,14 @@
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
+
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "")
+
 project(crashpad C CXX ASM)
 
 find_package(Threads)
 find_package(ZLIB)
+find_package(Python2 COMPONENTS Interpreter REQUIRED)
+
+include(apple.cmake)
 
 add_library(crashpad_common INTERFACE)
 
@@ -37,6 +43,10 @@ target_compile_options(crashpad_common
   -ffunction-sections
 )
 
+if(APPLE)
+  target_link_options(crashpad_common INTERFACE -Wl,-dead_strip)
+endif()
+
 target_compile_definitions(crashpad_common
   INTERFACE
   -D_FILE_OFFSET_BITS=64
@@ -47,11 +57,7 @@ target_compile_definitions(crashpad_common
 target_include_directories(crashpad_common
   INTERFACE
   ${CMAKE_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/compat/linux
-  ${CMAKE_SOURCE_DIR}/compat/non_mac
-  ${CMAKE_SOURCE_DIR}/compat/non_win
-  ${CMAKE_SOURCE_DIR}/../mini_chromium
-  ${CMAKE_SOURCE_DIR}/../lss
+  ${CMAKE_SOURCE_DIR}/third_party/mini_chromium/mini_chromium
 )
 
 macro(crashpad_set_props TARGET)
