@@ -93,11 +93,13 @@ target_link_libraries(crashpad_handler_test
   gtest
   gtest_main
   crashpad_test
+  crashpad_client
   snapshot
   snapshot_test_support
   util
   crashpad_handler
   mini_chromium_base
+  ZLIB::ZLIB
 )
 
 add_dependencies(crashpad_handler_test crashpad_handler_test_extended_handler)

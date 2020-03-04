@@ -117,6 +117,8 @@ target_link_libraries(crashpad_test_test
   mini_chromium_base
   crashpad_test
   crashpad_handler
+  crashpad_client
+  ZLIB::ZLIB
 )
 
 add_dependencies(crashpad_test_test crashpad_test_test_multiprocess_exec_test_child)

@@ -276,6 +276,7 @@ target_link_libraries(crashpad_snapshot_test
   gtest
   gtest_main
   crashpad_handler
+  ZLIB::ZLIB
 )
 
 add_dependencies(crashpad_snapshot_test

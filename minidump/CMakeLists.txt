@@ -119,4 +119,6 @@ target_link_libraries(crashpad_minidump_test
   snapshot_test_support
   snapshot
   crashpad_handler
+  crashpad_client
+  ZLIB::ZLIB
 )

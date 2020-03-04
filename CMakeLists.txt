@@ -8,7 +8,10 @@ enable_testing()
 
 find_package(Threads)
 find_package(ZLIB)
-find_package(Python2 COMPONENTS Interpreter REQUIRED)
+
+if(APPLE)
+  find_package(Python2 COMPONENTS Interpreter REQUIRED)
+endif()
 
 include(apple.cmake)
 

@@ -1,6 +1,10 @@
-add_library(compat INTERFACE)
-#crashpad_set_props(compat)
-#target_link_libraries(compat PRIVATE crashpad_common)
+if(APPLE)
+  add_library(compat INTERFACE)
+else()
+  add_library(compat OBJECT)
+  crashpad_set_props(compat)
+  target_link_libraries(compat PRIVATE crashpad_common)
+endif()
 
 if(UNIX AND (NOT APPLE))
   target_include_directories(compat INTERFACE linux)

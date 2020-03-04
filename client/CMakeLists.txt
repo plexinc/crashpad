@@ -93,4 +93,5 @@ target_link_libraries(crashpad_client_test
   gtest_main
   gmock
   mini_chromium_base
+  ZLIB::ZLIB
 )
