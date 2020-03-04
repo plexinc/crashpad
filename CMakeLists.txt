@@ -4,6 +4,8 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "")
 
 project(crashpad C CXX ASM)
 
+enable_testing()
+
 find_package(Threads)
 find_package(ZLIB)
 find_package(Python2 COMPONENTS Interpreter REQUIRED)
@@ -31,7 +33,7 @@ target_compile_options(crashpad_common
   -Wheader-hygiene
   -Wnewline-eof
   -Wstring-conversion
-  -Wexit-time-destructors
+  #-Wexit-time-destructors
   -Wimplicit-fallthrough
 
   -fno-exceptions
@@ -73,6 +75,24 @@ macro(crashpad_set_props TARGET)
   target_link_libraries(${TARGET} PRIVATE crashpad_common)
 endmacro()
 
+include(GoogleTest)
+
+add_custom_target(build_tests)
+
+macro(crashpad_add_test NAME)
+  add_executable(${NAME})
+  crashpad_set_props(${NAME})
+  if(APPLE)
+    target_link_libraries(${NAME} PRIVATE AppleFrameworks)
+  endif()
+  gtest_discover_tests(${NAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  add_dependencies(build_tests ${NAME})
+endmacro()
+
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
 add_subdirectory(compat)
 
 target_link_libraries(crashpad_common INTERFACE compat)
@@ -84,3 +104,5 @@ add_subdirectory(minidump)
 add_subdirectory(client)
 add_subdirectory(tools)
 add_subdirectory(handler)
+
+add_subdirectory(test)

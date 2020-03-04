@@ -64,3 +64,33 @@ if(WIN)
     simulate_crash_win.h
   )
 endif()
+
+crashpad_add_test(crashpad_client_test)
+
+target_sources(crashpad_client_test
+  PRIVATE
+  annotation_list_test.cc
+  annotation_test.cc
+  crash_report_database_test.cc
+  prune_crash_reports_test.cc
+  settings_test.cc
+  simple_address_range_bag_test.cc
+  simple_string_dictionary_test.cc
+)
+
+if(APPLE)
+  target_sources(crashpad_client_test PRIVATE simulate_crash_mac_test.cc)
+endif()
+
+target_link_libraries(crashpad_client_test
+  PRIVATE
+  util
+  snapshot
+  crashpad_client
+  crashpad_test
+  crashpad_handler
+  gtest
+  gtest_main
+  gmock
+  mini_chromium_base
+)

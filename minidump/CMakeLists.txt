@@ -56,3 +56,67 @@ target_sources(minidump
   minidump_writer_util.cc
   minidump_writer_util.h
 )
+
+add_library(minidump_test_support OBJECT)
+crashpad_set_props(minidump_test_support)
+target_sources(minidump_test_support
+  PRIVATE
+  test/minidump_byte_array_writer_test_util.cc
+  test/minidump_byte_array_writer_test_util.h
+  test/minidump_context_test_util.cc
+  test/minidump_context_test_util.h
+  test/minidump_file_writer_test_util.cc
+  test/minidump_file_writer_test_util.h
+  test/minidump_memory_writer_test_util.cc
+  test/minidump_memory_writer_test_util.h
+  test/minidump_rva_list_test_util.cc
+  test/minidump_rva_list_test_util.h
+  test/minidump_string_writer_test_util.cc
+  test/minidump_string_writer_test_util.h
+  test/minidump_user_extension_stream_util.cc
+  test/minidump_user_extension_stream_util.h
+  test/minidump_writable_test_util.cc
+  test/minidump_writable_test_util.h
+)
+
+target_link_libraries(minidump_test_support PRIVATE gtest)
+
+crashpad_add_test(crashpad_minidump_test)
+target_sources(crashpad_minidump_test
+  PRIVATE
+  minidump_annotation_writer_test.cc
+  minidump_byte_array_writer_test.cc
+  minidump_context_writer_test.cc
+  minidump_crashpad_info_writer_test.cc
+  minidump_exception_writer_test.cc
+  minidump_file_writer_test.cc
+  minidump_handle_writer_test.cc
+  minidump_memory_info_writer_test.cc
+  minidump_memory_writer_test.cc
+  minidump_misc_info_writer_test.cc
+  minidump_module_crashpad_info_writer_test.cc
+  minidump_module_writer_test.cc
+  minidump_rva_list_writer_test.cc
+  minidump_simple_string_dictionary_writer_test.cc
+  minidump_string_writer_test.cc
+  minidump_system_info_writer_test.cc
+  minidump_thread_id_map_test.cc
+  minidump_thread_writer_test.cc
+  minidump_unloaded_module_writer_test.cc
+  minidump_user_stream_writer_test.cc
+  minidump_writable_test.cc
+)
+
+target_link_libraries(crashpad_minidump_test
+  PRIVATE
+  minidump
+  minidump_test_support
+  crashpad_test
+  gtest
+  gtest_main
+  util
+  mini_chromium_base
+  snapshot_test_support
+  snapshot
+  crashpad_handler
+)

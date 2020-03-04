@@ -1,1 +1,2 @@
 add_subdirectory(mini_chromium)
+add_subdirectory(gtest)

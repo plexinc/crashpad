@@ -175,10 +175,148 @@ endif()
 
 message(STATUS ${CMAKE_SYSTEM_PROCESSOR})
 
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64)
   target_sources(snapshot
     PRIVATE
     x86/cpuid_reader.cc
     x86/cpuid_reader.h
+  )
+endif()
+
+
+add_library(snapshot_test_support OBJECT)
+crashpad_set_props(snapshot_test_support)
+target_sources(snapshot_test_support
+  PRIVATE
+  test/test_cpu_context.cc
+  test/test_cpu_context.h
+  test/test_exception_snapshot.cc
+  test/test_exception_snapshot.h
+  test/test_memory_map_region_snapshot.cc
+  test/test_memory_map_region_snapshot.h
+  test/test_memory_snapshot.cc
+  test/test_memory_snapshot.h
+  test/test_module_snapshot.cc
+  test/test_module_snapshot.h
+  test/test_process_snapshot.cc
+  test/test_process_snapshot.h
+  test/test_system_snapshot.cc
+  test/test_system_snapshot.h
+  test/test_thread_snapshot.cc
+  test/test_thread_snapshot.h
+)
+
+target_link_libraries(snapshot_test_support PRIVATE mini_chromium_base util)
+
+crashpad_add_test(crashpad_snapshot_test)
+target_sources(crashpad_snapshot_test
+  PRIVATE
+  cpu_context_test.cc
+  memory_snapshot_test.cc
+  minidump/process_snapshot_minidump_test.cc
+)
+
+if(APPLE)
+  target_sources(crashpad_snapshot_test
+    PRIVATE
+    mac/cpu_context_mac_test.cc
+    mac/mach_o_image_annotations_reader_test.cc
+    mac/mach_o_image_reader_test.cc
+    mac/mach_o_image_segment_reader_test.cc
+    mac/process_reader_mac_test.cc
+    mac/process_types_test.cc
+    mac/system_snapshot_mac_test.cc
+  )
+endif()
+
+if(UNIX AND NOT APPLE)
+  target_sources(crashpad_snapshot_test
+    PRIVATE
+    linux/debug_rendezvous_test.cc
+    linux/exception_snapshot_linux_test.cc
+    linux/process_reader_linux_test.cc
+    linux/system_snapshot_linux_test.cc
+    sanitized/process_snapshot_sanitized_test.cc
+    sanitized/sanitization_information_test.cc
+  )
+else()
+  target_sources(crashpad_snapshot_test PRIVATE crashpad_info_client_options_test.cc)
+endif()
+
+if(NOT APPLE)
+  target_sources(crashpad_snapshot_test
+    PRIVATE
+    crashpad_types/crashpad_info_reader_test.cc
+  )
+endif()
+
+if(WIN)
+  target_sources(crashpad_snapshot_test
+    PRIVATE
+    win/cpu_context_win_test.cc
+    win/exception_snapshot_win_test.cc
+    win/extra_memory_ranges_test.cc
+    win/module_snapshot_win_test.cc
+    win/pe_image_reader_test.cc
+    win/process_reader_win_test.cc
+    win/process_snapshot_win_test.cc
+    win/system_snapshot_win_test.cc
+  )
+else()
+  target_sources(crashpad_snapshot_test PRIVATE posix/timezone_test.cc)
+endif()
+
+target_link_libraries(crashpad_snapshot_test
+  PRIVATE
+  snapshot_test_support
+  crashpad_client
+  crashpad_test
+  mini_chromium_base
+  util
+  gtest
+  gtest_main
+  crashpad_handler
+)
+
+add_dependencies(crashpad_snapshot_test
+  crashpad_snapshot_test_module
+  crashpad_snapshot_test_module_large
+  crashpad_snapshot_test_module_small
+)
+
+set(CMAKE_SHARED_MODULE_PREFIX "")
+
+add_library(crashpad_snapshot_test_module MODULE crashpad_info_client_options_test_module.cc)
+crashpad_set_props(crashpad_snapshot_test_module)
+target_link_libraries(crashpad_snapshot_test_module PRIVATE crashpad_client AppleFrameworks)
+
+add_library(crashpad_snapshot_test_module_large MODULE crashpad_info_size_test_module.cc)
+crashpad_set_props(crashpad_snapshot_test_module_large)
+target_compile_definitions(crashpad_snapshot_test_module_large PRIVATE CRASHPAD_INFO_SIZE_TEST_MODULE_LARGE)
+target_link_libraries(crashpad_snapshot_test_module_large PRIVATE util AppleFrameworks)
+
+add_library(crashpad_snapshot_test_module_small MODULE crashpad_info_size_test_module.cc)
+crashpad_set_props(crashpad_snapshot_test_module_small)
+target_compile_definitions(crashpad_snapshot_test_module_small PRIVATE CRASHPAD_INFO_SIZE_TEST_MODULE_SMALL)
+target_link_libraries(crashpad_snapshot_test_module_large PRIVATE util AppleFrameworks)
+
+if(UNIX AND NOT APPLE)
+  add_library(crashpad_snapshot_test_both_dt_hash_styles MODULE hash_types_test.cc)
+  target_link_options(crashpad_snapshot_test_both_dt_hash_styles PRIVATE "-Wl,--hash-style=both")
+endif()
+
+if(APPLE)
+  add_library(crashpad_snapshot_test_module_crashy_initializer
+    MODULE
+    mac/mach_o_image_annotations_reader_test_module_crashy_initializer.cc
+  )
+  crashpad_set_props(crashpad_snapshot_test_module_crashy_initializer)
+
+  add_executable(crashpad_snapshot_test_no_op mac/mach_o_image_annotations_reader_test_no_op.cc)
+  crashpad_set_props(crashpad_snapshot_test_no_op)
+
+  add_dependencies(crashpad_snapshot_test
+    crashpad_snapshot_test_module_crashy_initializer
+    crashpad_snapshot_test_no_op
   )
 endif()
