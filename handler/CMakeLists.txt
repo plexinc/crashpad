@@ -41,7 +41,7 @@ if(APPLE)
   )
 endif()
 
-if(WIN)
+if(WIN32)
   target_sources(crashpad_handler
     PRIVATE
     win/crash_report_exception_handler.cc
@@ -61,7 +61,7 @@ set_target_properties(crashpad_handler_exe
 target_link_libraries(crashpad_handler_exe
   PRIVATE
   crashpad_client
-  ZLIB::ZLIB
+  ZlibInterface
   AppleFrameworks
   crashpad_handler
 )
@@ -83,7 +83,7 @@ target_link_libraries(crashpad_handler_test_extended_handler
   AppleFrameworks
   tool_support
   crashpad_client
-  ZLIB::ZLIB
+  ZlibInterface
 )
 
 crashpad_add_test(crashpad_handler_test)
@@ -99,7 +99,7 @@ target_link_libraries(crashpad_handler_test
   util
   crashpad_handler
   mini_chromium_base
-  ZLIB::ZLIB
+  ZlibInterface
 )
 
 add_dependencies(crashpad_handler_test crashpad_handler_test_extended_handler)

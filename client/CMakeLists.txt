@@ -56,7 +56,7 @@ if(UNIX AND NOT APPLE)
   )
 endif()
 
-if(WIN)
+if(WIN32)
   target_sources(crashpad_client
     PRIVATE
     crash_report_database_win.cc
@@ -93,5 +93,5 @@ target_link_libraries(crashpad_client_test
   gtest_main
   gmock
   mini_chromium_base
-  ZLIB::ZLIB
+  ZlibInterface
 )

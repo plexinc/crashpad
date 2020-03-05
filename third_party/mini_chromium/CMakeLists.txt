@@ -110,7 +110,7 @@ if(APPLE)
   )
 endif()
 
-if(WIN)
+if(WIN32)
   target_sources(mini_chromium_base
     PRIVATE
     mini_chromium/base/process/process_metrics_win.cc

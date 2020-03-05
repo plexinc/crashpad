@@ -63,7 +63,7 @@ if(UNIX AND NOT APPLE)
   )
 endif()
 
-if(WIN)
+if(WIN32)
   target_sources(crashpad_test
     PRIVATE
     multiprocess_exec_win.cc
@@ -118,7 +118,7 @@ target_link_libraries(crashpad_test_test
   crashpad_test
   crashpad_handler
   crashpad_client
-  ZLIB::ZLIB
+  ZlibInterface
 )
 
 add_dependencies(crashpad_test_test crashpad_test_test_multiprocess_exec_test_child)

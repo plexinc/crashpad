@@ -2,6 +2,7 @@ add_library(util OBJECT)
 crashpad_set_props(util)
 
 target_compile_definitions(util PRIVATE -DZLIB_CONST)
+target_link_libraries(util PRIVATE ZlibInterface compat)
 
 target_sources(util
   PRIVATE
@@ -280,11 +281,73 @@ if(UNIX AND NOT APPLE)
   )
 endif()
 
+if(WIN32)
+  target_sources(util
+    PRIVATE
+    file/directory_reader_win.cc
+    file/file_io_win.cc
+    file/filesystem_win.cc
+    misc/clock_win.cc
+    misc/paths_win.cc
+    misc/time_win.cc
+    net/http_transport_win.cc
+    process/process_memory_win.cc
+    process/process_memory_win.h
+    synchronization/semaphore_win.cc
+    thread/thread_win.cc
+    win/address_types.h
+    win/checked_win_address_range.h
+    win/command_line.cc
+    win/command_line.h
+    win/context_wrappers.h
+    win/critical_section_with_debug_info.cc
+    win/critical_section_with_debug_info.h
+    win/exception_handler_server.cc
+    win/exception_handler_server.h
+    win/get_function.cc
+    win/get_function.h
+    win/get_module_information.cc
+    win/get_module_information.h
+    win/handle.cc
+    win/handle.h
+    win/initial_client_data.cc
+    win/initial_client_data.h
+    win/loader_lock.cc
+    win/loader_lock.h
+    win/module_version.cc
+    win/module_version.h
+    win/nt_internals.cc
+    win/nt_internals.h
+    win/ntstatus_logging.cc
+    win/ntstatus_logging.h
+    win/process_info.cc
+    win/process_info.h
+    win/process_structs.h
+    win/registration_protocol_win.cc
+    win/registration_protocol_win.h
+    win/safe_terminate_process.h
+    win/scoped_handle.cc
+    win/scoped_handle.h
+    win/scoped_local_alloc.cc
+    win/scoped_local_alloc.h
+    win/scoped_process_suspend.cc
+    win/scoped_process_suspend.h
+    win/scoped_set_event.cc
+    win/scoped_set_event.h
+    win/session_end_watcher.cc
+    win/session_end_watcher.h
+    win/termination_codes.h
+    win/xp_compat.h
+    misc/capture_context_win.asm
+    win/safe_terminate_process.asm
+  )
+endif()
+
 add_executable(http_transport_test_server net/http_transport_test_server.cc)
 crashpad_set_props(http_transport_test_server)
 target_link_libraries(http_transport_test_server
   PRIVATE
-  ZLIB::ZLIB
+  ZlibInterface
   util
   tool_support
   mini_chromium_base
@@ -400,7 +463,7 @@ if(APPLE)
   )
 endif()
 
-if(WIN)
+if(WIN32)
   target_sources(crashpad_util_test
     PRIVATE
     misc/capture_context_test_util_win.cc
@@ -428,7 +491,7 @@ target_link_libraries(crashpad_util_test
   crashpad_client
   crashpad_handler
   mini_chromium_base
-  ZLIB::ZLIB
+  ZlibInterface
 )
 
 execute_process(

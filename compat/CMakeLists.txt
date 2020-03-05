@@ -3,7 +3,6 @@ if(APPLE)
 else()
   add_library(compat OBJECT)
   crashpad_set_props(compat)
-  target_link_libraries(compat PRIVATE crashpad_common)
 endif()
 
 if(UNIX AND (NOT APPLE))
@@ -16,11 +15,11 @@ else()
   target_include_directories(compat INTERFACE non_elf)
 endif()
 
-if(NOT WIN)
+if(NOT WIN32)
   target_include_directories(compat INTERFACE non_win)
 endif()
 
-if(WIN)
+if(WIN32)
   target_include_directories(compat INTERFACE win)
   target_sources(compat
     PRIVATE
@@ -33,6 +32,7 @@ if(WIN)
     win/winbase.h
     win/winnt.h
     win/winternl.h
+    ${CMAKE_SOURCE_DIR}/third_party/getopt/getopt.cc
   )
 endif()
 

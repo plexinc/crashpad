@@ -133,7 +133,7 @@ if(APPLE)
   )
 endif()
 
-if(UNIX OR WIN AND NOT APPLE)
+if(UNIX OR WIN32 AND NOT APPLE)
   target_sources(snapshot
     PRIVATE
     crashpad_types/crashpad_info_reader.cc
@@ -141,7 +141,7 @@ if(UNIX OR WIN AND NOT APPLE)
   )
 endif()
 
-if(WIN)
+if(WIN32)
   target_sources(snapshot
     PRIVATE
     win/capture_memory_delegate_win.cc
@@ -250,7 +250,7 @@ if(NOT APPLE)
   )
 endif()
 
-if(WIN)
+if(WIN32)
   target_sources(crashpad_snapshot_test
     PRIVATE
     win/cpu_context_win_test.cc
@@ -268,6 +268,7 @@ endif()
 
 target_link_libraries(crashpad_snapshot_test
   PRIVATE
+  compat
   snapshot_test_support
   crashpad_client
   crashpad_test
@@ -276,7 +277,7 @@ target_link_libraries(crashpad_snapshot_test
   gtest
   gtest_main
   crashpad_handler
-  ZLIB::ZLIB
+  ZlibInterface
 )
 
 add_dependencies(crashpad_snapshot_test
@@ -294,12 +295,18 @@ target_link_libraries(crashpad_snapshot_test_module PRIVATE crashpad_client Appl
 add_library(crashpad_snapshot_test_module_large MODULE crashpad_info_size_test_module.cc)
 crashpad_set_props(crashpad_snapshot_test_module_large)
 target_compile_definitions(crashpad_snapshot_test_module_large PRIVATE CRASHPAD_INFO_SIZE_TEST_MODULE_LARGE)
-target_link_libraries(crashpad_snapshot_test_module_large PRIVATE util AppleFrameworks)
+target_link_libraries(crashpad_snapshot_test_module_large PRIVATE mini_chromium_base AppleFrameworks)
+if(UNIX)
+  target_link_libraries(crashpad_snapshot_test_module_large PRIVATE util)
+endif()
 
 add_library(crashpad_snapshot_test_module_small MODULE crashpad_info_size_test_module.cc)
 crashpad_set_props(crashpad_snapshot_test_module_small)
 target_compile_definitions(crashpad_snapshot_test_module_small PRIVATE CRASHPAD_INFO_SIZE_TEST_MODULE_SMALL)
-target_link_libraries(crashpad_snapshot_test_module_large PRIVATE util AppleFrameworks)
+target_link_libraries(crashpad_snapshot_test_module_small PRIVATE AppleFrameworks)
+if(UNIX)
+  target_link_libraries(crashpad_snapshot_test_module_small PRIVATE util)
+endif()
 
 if(UNIX AND NOT APPLE)
   add_library(crashpad_snapshot_test_both_dt_hash_styles MODULE hash_types_test.cc)
@@ -319,5 +326,40 @@ if(APPLE)
   add_dependencies(crashpad_snapshot_test
     crashpad_snapshot_test_module_crashy_initializer
     crashpad_snapshot_test_no_op
+  )
+endif()
+
+if(WIN32)
+  add_executable(crashpad_snapshot_test_annotations win/crashpad_snapshot_test_annotations.cc)
+  crashpad_set_props(crashpad_snapshot_test_annotations)
+  target_link_libraries(crashpad_snapshot_test_annotations PRIVATE crashpad_client mini_chromium_base)
+
+  add_executable(crashpad_snapshot_test_crashing_child win/crashpad_snapshot_test_crashing_child.cc)
+  crashpad_set_props(crashpad_snapshot_test_crashing_child)
+  target_link_libraries(crashpad_snapshot_test_crashing_child PRIVATE crashpad_client mini_chromium_base util)
+
+  add_executable(crashpad_snapshot_test_dump_without_crashing win/crashpad_snapshot_test_dump_without_crashing.cc)
+  crashpad_set_props(crashpad_snapshot_test_dump_without_crashing)
+  target_link_libraries(crashpad_snapshot_test_dump_without_crashing PRIVATE crashpad_client mini_chromium_base util)
+
+  add_executable(crashpad_snapshot_test_extra_memory_ranges win/crashpad_snapshot_test_extra_memory_ranges.cc)
+  crashpad_set_props(crashpad_snapshot_test_extra_memory_ranges)
+  target_link_libraries(crashpad_snapshot_test_extra_memory_ranges PRIVATE crashpad_client mini_chromium_base)
+
+  add_executable(crashpad_snapshot_test_image_reader win/crashpad_snapshot_test_image_reader.cc)
+  crashpad_set_props(crashpad_snapshot_test_image_reader)
+  target_link_libraries(crashpad_snapshot_test_image_reader PRIVATE crashpad_client mini_chromium_base util)
+
+  add_library(crashpad_snapshot_test_image_reader_module MODULE win/crashpad_snapshot_test_image_reader_module.cc)
+  crashpad_set_props(crashpad_snapshot_test_image_reader_module)
+  target_link_libraries(crashpad_snapshot_test_image_reader_module PRIVATE crashpad_client mini_chromium_base)
+
+  add_dependencies(crashpad_snapshot_test
+    crashpad_snapshot_test_annotations
+    crashpad_snapshot_test_crashing_child
+    crashpad_snapshot_test_dump_without_crashing
+    crashpad_snapshot_test_extra_memory_ranges
+    crashpad_snapshot_test_image_reader
+    crashpad_snapshot_test_image_reader_module
   )
 endif()

@@ -3,7 +3,10 @@ crashpad_set_props(gtest)
 
 target_include_directories(gtest PUBLIC gtest/googletest/include PRIVATE gtest/googletest)
 target_compile_definitions(gtest PUBLIC GUNIT_NO_GOOGLE3=1)
-target_compile_options(gtest PUBLIC -Wno-inconsistent-missing-override)
+
+if(NOT MSVC)
+  target_compile_options(gtest PUBLIC -Wno-inconsistent-missing-override)
+endif()
 
 target_sources(gtest
   PRIVATE
@@ -44,7 +47,10 @@ add_library(gmock OBJECT)
 crashpad_set_props(gmock)
 target_include_directories(gmock PUBLIC gtest/googlemock/include)
 target_link_libraries(gmock PRIVATE gtest)
-target_compile_options(gmock PUBLIC -Wno-inconsistent-missing-override)
+
+if(NOT MSVC)
+  target_compile_options(gmock PUBLIC -Wno-inconsistent-missing-override)
+endif()
 
 target_sources(gmock
   PRIVATE
