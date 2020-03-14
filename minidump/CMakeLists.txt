@@ -109,7 +109,6 @@ target_sources(crashpad_minidump_test
 
 target_link_libraries(crashpad_minidump_test
   PRIVATE
-  compat
   minidump
   minidump_test_support
   crashpad_test

@@ -2,7 +2,7 @@ add_library(util OBJECT)
 crashpad_set_props(util)
 
 target_compile_definitions(util PRIVATE -DZLIB_CONST)
-target_link_libraries(util PRIVATE ZlibInterface compat)
+target_link_libraries(util PRIVATE ZlibInterface)
 
 target_sources(util
   PRIVATE
@@ -352,6 +352,7 @@ target_link_libraries(http_transport_test_server
   tool_support
   mini_chromium_base
   AppleFrameworks
+  $<$<CXX_COMPILER_ID:MSVC>:ws2_32.lib>
 )
 
 crashpad_add_test(crashpad_util_test)
@@ -492,7 +493,21 @@ target_link_libraries(crashpad_util_test
   crashpad_handler
   mini_chromium_base
   ZlibInterface
+  $<$<CXX_COMPILER_ID:MSVC>:rpcrt4.lib>
+  $<$<CXX_COMPILER_ID:MSVC>:dbghelp.lib>
 )
+
+if(WIN32)
+  add_executable(crashpad_util_test_process_info_test_child win/process_info_test_child.cc)
+  crashpad_set_props(crashpad_util_test_process_info_test_child)
+
+  add_executable(crashpad_util_test_safe_terminate_process_test_child win/safe_terminate_process_test_child.cc)
+  crashpad_set_props(crashpad_util_test_safe_terminate_process_test_child)
+
+  add_library(crashpad_util_test_loader_lock_test MODULE win/loader_lock_test_dll.cc)
+  crashpad_set_props(crashpad_util_test_loader_lock_test)
+  target_link_libraries(crashpad_util_test_loader_lock_test PRIVATE util mini_chromium_base)
+endif()
 
 execute_process(
   COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/net/testdata

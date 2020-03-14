@@ -268,7 +268,6 @@ endif()
 
 target_link_libraries(crashpad_snapshot_test
   PRIVATE
-  compat
   snapshot_test_support
   crashpad_client
   crashpad_test

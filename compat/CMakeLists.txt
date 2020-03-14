@@ -6,7 +6,7 @@ else()
 endif()
 
 if(UNIX AND (NOT APPLE))
-  target_include_directories(compat INTERFACE linux)
+  target_include_directories(compat PUBLIC linux)
   target_sources(compat
     PRIVATE
     linux/sys/mman.cc
@@ -16,11 +16,11 @@ else()
 endif()
 
 if(NOT WIN32)
-  target_include_directories(compat INTERFACE non_win)
+  target_include_directories(compat PUBLIC non_win)
 endif()
 
 if(WIN32)
-  target_include_directories(compat INTERFACE win)
+  target_include_directories(compat PUBLIC win)
   target_sources(compat
     PRIVATE
     win/getopt.h
@@ -39,5 +39,5 @@ endif()
 if(APPLE)
   target_include_directories(compat INTERFACE mac)
 else()
-  target_include_directories(compat INTERFACE non_mac)
+  target_include_directories(compat PUBLIC non_mac)
 endif()
