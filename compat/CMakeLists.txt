@@ -15,6 +15,28 @@ else()
   target_include_directories(compat INTERFACE non_elf)
 endif()
 
+if(ANDROID)
+  target_include_directories(compat PUBLIC android)
+  target_sources(compat
+    PRIVATE
+    android/android/api-level.cc
+    android/android/api-level.h
+    android/dlfcn_internal.cc
+    android/dlfcn_internal.h
+    android/elf.h
+    android/linux/elf.h
+    android/linux/prctl.h
+    android/linux/ptrace.h
+    android/sched.h
+    android/sys/epoll.cc
+    android/sys/epoll.h
+    android/sys/mman.cc
+    android/sys/mman.h
+    android/sys/syscall.h
+    android/sys/user.h
+  )
+endif()
+
 if(NOT WIN32)
   target_include_directories(compat PUBLIC non_win)
 endif()

@@ -22,7 +22,7 @@ if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 
   target_link_libraries(ZlibInterface INTERFACE CONAN_PKG::zlib)
 else()
-  find_package(ZLib)
+  find_package(ZLIB)
   target_link_libraries(ZlibInterface INTERFACE ZLIB::ZLIB)
 endif()
 
@@ -73,6 +73,10 @@ if(APPLE)
   target_link_options(crashpad_common INTERFACE -Wl,-dead_strip)
 endif()
 
+if(ANDROID)
+  target_link_libraries(crashpad_common INTERFACE -llog)
+endif()
+
 target_compile_definitions(crashpad_common
   INTERFACE
   -D_FILE_OFFSET_BITS=64
@@ -113,7 +117,9 @@ macro(crashpad_add_test NAME)
   if(APPLE)
     target_link_libraries(${NAME} PRIVATE AppleFrameworks)
   endif()
-  gtest_discover_tests(${NAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  if(NOT ANDROID)
+    gtest_discover_tests(${NAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  endif()
   add_dependencies(build_tests ${NAME})
 endmacro()
 

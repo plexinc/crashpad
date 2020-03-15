@@ -24,9 +24,14 @@ if(UNIX AND NOT APPLE)
     linux/crash_report_exception_handler.h
     linux/exception_handler_server.cc
     linux/exception_handler_server.h
-    linux/cros_crash_report_exception_handler.cc
-    linux/cros_crash_report_exception_handler.h
   )
+  if(NOT ANDROID)
+    target_sources(crashpad_handler
+      PRIVATE
+      linux/cros_crash_report_exception_handler.cc
+      linux/cros_crash_report_exception_handler.h
+    )
+  endif()
 endif()
 
 if(APPLE)
